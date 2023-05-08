@@ -1,0 +1,85 @@
+﻿@{
+    ViewData["Title"] = "Lista de contactos";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<h2>Agregar nuevo contacto</h2>
+<form id="formularioContacto">
+    <div class="form-group">
+        <label for="nombre">Nombre:</label>
+        <input type="text" class="form-control" id="nombre" required>
+    </div>
+    <div class="form-group">
+        <label for="telefono">Teléfono:</label>
+        <input type="text" class="form-control" id="telefono" required>
+    </div>
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" class="form-control" id="email" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Agregar contacto</button>
+</form>
+<hr>
+
+<table id="tablaContactos" class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Nombre</th>
+            <th>Teléfono</th>
+            <th>Email</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: '@Url.Action("ObtenerContactos", "Contactos")',
+                type: 'GET',
+                dataType: 'json',
+                success: function (contactos) {
+                    var tabla = $('#tablaContactos tbody');
+                    $.each(contactos, function (index, contacto) {
+                        var fila = $('<tr>');
+                        fila.append($('<td>').text(contacto.id));
+                        fila.append($('<td>').text(contacto.nombre));
+                        fila.append($('<td>').text(contacto.telefono));
+                        fila.append($('<td>').text(contacto.email));
+                        tabla.append(fila);
+                    });
+                },
+                error: function () {
+                    alert('Error al cargar la lista de contactos');
+                }
+            });
+        });
+
+        $("#formularioContacto").submit(function (event) {
+            event.preventDefault();
+
+            var nuevoContacto = {
+                id: Date.now(),
+                nombre: $("#nombre").val(),
+                telefono: $("#telefono").val(),
+                email: $("#email").val()
+            };
+
+            var tabla = $("#tablaContactos tbody");
+            var fila = $("<tr>");
+            fila.append($("<td>").text(nuevoContacto.id));
+            fila.append($("<td>").text(nuevoContacto.nombre));
+            fila.append($("<td>").text(nuevoContacto.telefono));
+            fila.append($("<td>").text(nuevoContacto.email));
+            tabla.append(fila);
+
+            $("#nombre").val("");
+            $("#telefono").val("");
+            $("#email").val("");
+        });
+    </script>
+}
